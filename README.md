@@ -98,6 +98,33 @@ fastapi-base/
 └── README.md            # 프로젝트 문서
 ```
 
+각 폴더의 상세 설명은 해당 폴더의 README.md 파일을 참조하세요:
+- [API 구조](app/api/README.md)
+- [Core 구조](app/core/README.md)
+- [DB 구조](app/db/README.md)
+- [Schemas 구조](app/schemas/README.md)
+- [Services 구조](app/services/README.md)
+- [CRUD 구조](app/crud/README.md)
+
+## 개발 가이드라인
+
+### 코드 스타일
+- Black을 사용한 코드 포맷팅
+- isort를 사용한 import 정렬
+- mypy를 사용한 타입 체크
+
+### API 개발
+1. `app/api/v1/endpoints/`에 새로운 엔드포인트 파일 생성
+2. `app/schemas/`에 필요한 Pydantic 모델 정의
+3. `app/services/`에 비즈니스 로직 구현
+4. `app/crud/`에 데이터베이스 작업 구현
+5. `app/api/v1/api.py`에 라우터 등록
+
+### 테스트 작성
+- `tests/` 디렉토리에 테스트 파일 생성
+- pytest를 사용한 테스트 작성
+- 비동기 테스트는 `pytest-asyncio` 사용
+
 ## 로깅 사용법
 
 로깅 시스템은 `app.core.logging` 모듈을 통해 사용할 수 있습니다:
