@@ -2,17 +2,18 @@ import logging
 import sys
 from pathlib import Path
 from types import FrameType
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from loguru import logger
 
 
 class InterceptHandler(logging.Handler):
     def emit(self, record: logging.LogRecord) -> None:
+        level: str
         try:
             level = logger.level(record.levelname).name
         except ValueError:
-            level = record.levelno
+            level = str(record.levelno)
 
         frame: Optional[FrameType] = logging.currentframe()
         depth = 2
