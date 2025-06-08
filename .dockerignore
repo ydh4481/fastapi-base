@@ -1,9 +1,14 @@
+# Git
+.git
+.gitignore
+
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
+env/
 build/
 develop-eggs/
 dist/
@@ -19,33 +24,32 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+.pytest_cache/
+.coverage
+htmlcov/
 
 # Virtual Environment
-.env
-.venv
-env/
 venv/
 ENV/
+.env
+.venv
+.env.*
 
 # IDE
 .idea/
-.vscode/*
-!.vscode/settings.json
+.vscode/
 *.swp
 *.swo
 .DS_Store
 
-# Testing
-.coverage
-htmlcov/
-.pytest_cache/
-.mypy_cache/
+# Docker
+Dockerfile
+docker-compose*.yml
+docker-compose.yaml
+.docker/
 
-# Logs
-logs/
+# Project specific
+alembic/
+tests/
 *.log
-
-# Database
-*.db
-*.sqlite3
-.data/
+*.sqlite3 

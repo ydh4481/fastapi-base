@@ -2,21 +2,16 @@
 
 FastAPI 기반의 프로젝트 보일러플레이트입니다.
 
-## 기능
+## 주요 특징
 
 - FastAPI 기반의 RESTful API 서버
 - PostgreSQL 데이터베이스 연동 (SQLAlchemy + asyncpg)
 - Alembic을 통한 데이터베이스 마이그레이션
-- Poetry를 통한 의존성 관리
-- Docker 컨테이너화
+- Poetry를 통한 의존성 관리 (pyproject.toml, poetry.lock)
+- Docker 및 Docker Compose 지원
 - JWT 기반 인증
 - CORS 설정
-- 로깅 설정
-  - loguru를 사용한 구조화된 로깅
-  - 콘솔과 파일 동시 출력
-  - 자동 로그 파일 로테이션 (500MB)
-  - 로그 보관 기간 설정 (1주일)
-  - FastAPI와 Uvicorn 로그 통합
+- loguru 기반 로깅
 - 테스트 환경 구성
 
 ## 시작하기
@@ -25,10 +20,9 @@ FastAPI 기반의 프로젝트 보일러플레이트입니다.
 
 - Python 3.12 이상
 - Poetry
-- PostgreSQL
-- Docker (선택사항)
+- Docker, Docker Compose
 
-### 설치
+### 설치 및 환경설정
 
 1. 저장소 클론:
 ```bash
@@ -36,9 +30,10 @@ git clone https://github.com/yourusername/fastapi-base.git
 cd fastapi-base
 ```
 
-2. 프로젝트 초기화:
+2. 환경 변수 파일 준비:
 ```bash
-./scripts/init_project.sh
+cp .env.example .env
+# .env 파일을 편집하여 필요한 설정을 변경하세요
 ```
 
 3. 의존성 설치:
@@ -46,13 +41,7 @@ cd fastapi-base
 poetry install
 ```
 
-4. 환경 변수 설정:
-```bash
-cp .env.example .env
-# .env 파일을 편집하여 필요한 설정을 변경하세요
-```
-
-5. 데이터베이스 마이그레이션:
+4. 데이터베이스 마이그레이션:
 ```bash
 poetry run alembic upgrade head
 ```
@@ -61,19 +50,29 @@ poetry run alembic upgrade head
 
 개발 서버 실행:
 ```bash
-poetry run start
-```
-
-프로덕션 서버 실행:
-```bash
-poetry run start-prod
+poetry run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 ### Docker로 실행
 
+1. Docker 이미지 빌드 및 서비스 시작:
 ```bash
-docker-compose up -d
+docker-compose up -d --build
 ```
+
+2. (선택) 데이터베이스 마이그레이션:
+```bash
+docker-compose exec api alembic upgrade head
+```
+
+### 환경 변수 관리
+- 모든 환경 변수는 `.env` 파일에서 관리합니다.
+- 서비스 이름, DB 정보, 시크릿 키 등 모든 설정을 `.env`에서 일관되게 관리하세요.
+- `pyproject.toml`은 Python 의존성 및 프로젝트 메타 정보만 관리합니다.
+
+### poetry.lock 관리
+- `poetry.lock` 파일은 반드시 Git에 포함하세요.
+- 배포 및 개발 환경의 패키지 버전을 일치시킵니다.
 
 ## 프로젝트 구조
 
@@ -89,70 +88,28 @@ fastapi-base/
 │   └── main.py           # 애플리케이션 진입점
 ├── tests/                # 테스트 코드
 ├── alembic/              # 데이터베이스 마이그레이션
-├── scripts/              # 유틸리티 스크립트
 ├── logs/                 # 로그 파일 디렉토리
 ├── .env                  # 환경 변수
 ├── .env.example          # 환경 변수 예제
 ├── docker-compose.yaml   # Docker Compose 설정
 ├── pyproject.toml        # Poetry 설정
+├── poetry.lock           # 의존성 버전 고정 파일
 └── README.md            # 프로젝트 문서
 ```
 
-각 폴더의 상세 설명은 해당 폴더의 README.md 파일을 참조하세요:
-- [API 구조](app/api/README.md)
-- [Core 구조](app/core/README.md)
-- [DB 구조](app/db/README.md)
-- [Schemas 구조](app/schemas/README.md)
-- [Services 구조](app/services/README.md)
-- [CRUD 구조](app/crud/README.md)
-
 ## 개발 가이드라인
 
-### 코드 스타일
 - Black을 사용한 코드 포맷팅
 - isort를 사용한 import 정렬
 - mypy를 사용한 타입 체크
-
-### API 개발
-1. `app/api/v1/endpoints/`에 새로운 엔드포인트 파일 생성
-2. `app/schemas/`에 필요한 Pydantic 모델 정의
-3. `app/services/`에 비즈니스 로직 구현
-4. `app/crud/`에 데이터베이스 작업 구현
-5. `app/api/v1/api.py`에 라우터 등록
-
-### 테스트 작성
-- `tests/` 디렉토리에 테스트 파일 생성
-- pytest를 사용한 테스트 작성
-- 비동기 테스트는 `pytest-asyncio` 사용
-
-## 로깅 사용법
-
-로깅 시스템은 `app.core.logging` 모듈을 통해 사용할 수 있습니다:
-
-```python
-from app.core.logging import get_logger
-
-# 로거 가져오기
-logger = get_logger(__name__)
-
-# 로그 출력
-logger.info("정보 메시지")
-logger.error("에러 메시지")
-logger.debug("디버그 메시지")
-```
-
-로그 파일은 `logs/app.log`에 저장되며, 다음과 같은 형식으로 출력됩니다:
-```
-2024-03-14 10:30:45.123 | INFO     | app.api.v1.endpoints.health:health_check:10 - Health check requested
-```
+- 모든 설정은 `.env`와 `pyproject.toml`에서 관리
+- Docker Compose로 손쉽게 개발/운영 환경 구성
 
 ## API 문서
-
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
 
 ## 테스트
-
 ```bash
 poetry run pytest
 ```

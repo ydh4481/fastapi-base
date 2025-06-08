@@ -61,7 +61,6 @@ HTTP_METHOD /api/v1/endpoint
     }
 }
 ```
-```
 
 ### 템플릿 규칙
 
